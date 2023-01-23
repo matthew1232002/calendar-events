@@ -20,7 +20,14 @@ export function Day({ day, rowIdx, dayEvents }: DayProps) {
     setHolidays(events);
   }, [holidayEvents, day]);
 
-  const handleOpenModal = (e: MouseEvent<HTMLDivElement>) => {
+  const handleCreateEvent = (e: MouseEvent<HTMLDivElement>) => {
+    if (e.button === 0 && (e.target as HTMLButtonElement).role !== 'button') {
+      setDaySelected(day);
+      setShowEventModal(true);
+    }
+  };
+  const handlePickEvent = (evt: EventItem) => {
+    setSelectedEvent(evt);
     setDaySelected(day);
     setShowEventModal(true);
   };
@@ -36,7 +43,7 @@ export function Day({ day, rowIdx, dayEvents }: DayProps) {
           <EventsContainer
             {...provided.droppableProps}
             ref={provided.innerRef}
-            onClick={handleOpenModal}
+            onMouseDown={handleCreateEvent}
           >
             {holidays.map((evt, idx) => (
               <EvtItem key={idx} bgColor={evt.label[0]}>
@@ -51,7 +58,7 @@ export function Day({ day, rowIdx, dayEvents }: DayProps) {
                     {...provided.draggableProps}
                     {...provided.dragHandleProps}
                     bgColor={evt.label[0]}
-                    onClick={() => setSelectedEvent(evt)}
+                    onClick={() => handlePickEvent(evt)}
                   >
                     {evt.title}
                     {' | '}
