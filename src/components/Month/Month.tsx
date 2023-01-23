@@ -22,8 +22,19 @@ export function Month({ month }: MonthProps) {
   };
 
   const handleOnDragEnd = (result: DropResult) => {
-    const { destination, draggableId } = result;
+    const { destination, draggableId, source } = result;
     if (!destination) return;
+
+    if (source.droppableId !== destination.droppableId) {
+      const currentEvt: EventItem = filteredEvents.find((item) => item.id === +draggableId)!;
+      currentEvt.day = +destination.droppableId;
+      const destinationEvents = filteredEvents.filter((item) => item.day === currentEvt.day);
+      const destinationUpdated = destinationEvents.filter((item) => item.id !== currentEvt.id);
+      destinationUpdated.splice(destination.index, 0, currentEvt);
+      const eventsWithoutCurr = filteredEvents.filter((item) => item.id !== currentEvt.id);
+      const reorderedEvents = [...new Set([...destinationUpdated, ...eventsWithoutCurr])];
+      return dispatchCalEvent({ type: EventActionsType.IMPORT, payload: reorderedEvents });
+    }
 
     const currentEvt: EventItem = filteredEvents.find((item) => item.id === +draggableId)!;
     currentEvt.day = +destination.droppableId;
